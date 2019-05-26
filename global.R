@@ -63,14 +63,19 @@ population <-
 small_areas <- 
   st_read("https://data.melbourne.vic.gov.au/api/geospatial/gei8-3w86?method=export&format=GeoJSON", stringsAsFactors = FALSE)
 
+
 employment <- 
   read_csv("https://data.melbourne.vic.gov.au/api/views/b36j-kiy4/rows.csv?accessType=DOWNLOAD") %>%
   gather(ANZSIC_1, Jobs, -`Census year`, -`Block ID`, -`CLUE small area`) %>%
   mutate(Jobs = ifelse(is.na(Jobs), 0, Jobs)) %>%
   mutate(`Block ID` = as.character(`Block ID`))
 
+
+dwelling_data <-
+  read_csv("https://data.melbourne.vic.gov.au/api/views/44kh-ty54/rows.csv?accessType=DOWNLOAD")
+
 dwellings <-
-  read_csv("https://data.melbourne.vic.gov.au/api/views/44kh-ty54/rows.csv?accessType=DOWNLOAD") %>%
+  dwelling_data %>%
   group_by(`Census year`, `Block ID`) %>%
   summarise(Dwellings = sum(`Dwelling number`, na.rm =TRUE)) %>%
   mutate(`Block ID` = as.character(`Block ID`))
@@ -96,7 +101,8 @@ emp_area_year_ind_plot <-
              arrange(-Jobs), 
            aes(y = `Jobs` ,
                x = reorder(`ANZSIC_1`, `Jobs`))) +
-      geom_bar(stat = "identity") +
+      geom_bar(stat = "identity",
+               fill = "orangered1") +
       coord_flip()
       }
 
@@ -104,8 +110,10 @@ population_area_forecast <-
   function(area){
     ggplot(data = population %>%
              filter(geography == area),
-           aes(y = total_population, x = year))+
-      geom_line()
+           aes(y = total_population, 
+               x = year))+
+      geom_line(color = "orangered1",
+                size = 2)
   }
   
 basic_choropleth <- function (data, value, pall) {

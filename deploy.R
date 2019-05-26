@@ -1,6 +1,7 @@
 library(rsconnect)
 
-rsconnect::deployApp("E:/WORKING/CLUE_Vis")
+rsconnect::deployApp("F:/OD_Viz", 
+                     appName = "Open_Data_Visualisations")
 
 
 
