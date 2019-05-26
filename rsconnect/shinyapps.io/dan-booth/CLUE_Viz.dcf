@@ -1,0 +1,12 @@
+name: CLUE_Viz
+title:
+username:
+account: dan-booth
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 937143
+bundleId: 2094539
+url: https://dan-booth.shinyapps.io/CLUE_Viz/
+when: 1558264590.33335
+asMultiple: FALSE
+asStatic: FALSE
