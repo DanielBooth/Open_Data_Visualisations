@@ -5,7 +5,8 @@ library(sf)
 library(tmap)
 library(leaflet)
 library(shinythemes)
-
+library(viridisLite)
+library(stringr)
 
 #---- lists -----
 
@@ -65,10 +66,11 @@ small_areas <-
 
 
 employment <- 
-  read_csv("https://data.melbourne.vic.gov.au/api/views/b36j-kiy4/rows.csv?accessType=DOWNLOAD") %>%
-  gather(ANZSIC_1, Jobs, -`Census year`, -`Block ID`, -`CLUE small area`) %>%
-  mutate(Jobs = ifelse(is.na(Jobs), 0, Jobs)) %>%
-  mutate(`Block ID` = as.character(`Block ID`))
+  read_csv("https://data.melbourne.vic.gov.au/api/views/mi2q-4527/rows.csv?accessType=DOWNLOAD") %>% # load from open data 
+  gather(ANZSIC_1, Jobs, -`Census year`, -`Block ID`, -`CLUE small area`) %>% # change from wide table to long tables
+  mutate(Jobs = as.integer(Jobs)) %>% # Changes the jobs number to an integer rather than text, seriously open data team this is broken.
+  mutate(Jobs = ifelse(is.na(Jobs), 0, Jobs)) %>% # Change NAs to 0 because a NA in this case is a 0
+  mutate(`Block ID` = as.character(`Block ID`)) # Change the block id to a character so its type fits with our other data 
 
 
 dwelling_data <-
@@ -102,7 +104,7 @@ emp_area_year_ind_plot <-
            aes(y = `Jobs` ,
                x = reorder(`ANZSIC_1`, `Jobs`))) +
       geom_bar(stat = "identity",
-               fill = "orangered1") +
+               fill = "#7947b8") +
       coord_flip()
       }
 
@@ -112,22 +114,19 @@ population_area_forecast <-
              filter(geography == area),
            aes(y = total_population, 
                x = year))+
-      geom_line(color = "orangered1",
+      geom_line(color = "#7947b8",
                 size = 2)
   }
   
-basic_choropleth <- function (data, value, pall) {
-  
+basic_choropleth <- function (data, value, pall) { # function to build a simple choropleth
   tm <- 
-    tm_shape(data) + 
-    tm_polygons(value,
-                alpha = .5,
-                palette = pall,
+    tm_shape(data) + # 'data' is a data.frame with polygon
+    tm_polygons(value, # 'value' is the layer we want to visualise
+                alpha = .5, 
+                palette = pall, # 'pall' is the style of colour pallete we want to use  
                 border.col = "black",
-                n = 7) 
-#    tm_shape(subject) +
-#    tm_fill(col = "black")
-  
+                n = 7,
+                showNA = FALSE) 
   tmap_leaflet(tm)
 }
 
